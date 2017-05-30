@@ -7,8 +7,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="38dp">
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change View"
+            android:id= "@+id/button_ChangeView"
+            android:onClick="changeView"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Track"
+            android:id="@+id/button" />
     </LinearLayout>
 
 
@@ -24,16 +37,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
     android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="384dp"
+    android:layout_height="458dp"
     tools:context="com.example.mukhopadhyayd0116.mymapapp.MapsActivity" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Change View"
-        android:id= "@+id/button_ChangeView"
-        android:onClick="changeView"
-        />
-
-    </LinearLayout>
+</LinearLayout>
