@@ -21,7 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Track"
-            android:id="@+id/button" />
+            android:id="@+id/button"
+            android:onClick="getLocation" />
     </LinearLayout>
 
 
@@ -37,7 +38,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
     android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="384dp"
+    android:layout_width="379dp"
     android:layout_height="458dp"
     tools:context="com.example.mukhopadhyayd0116.mymapapp.MapsActivity" />
 
