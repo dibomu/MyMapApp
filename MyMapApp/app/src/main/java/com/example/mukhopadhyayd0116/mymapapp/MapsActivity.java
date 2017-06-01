@@ -14,10 +14,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,7 +33,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean canGetLocation = false;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 15 * 1;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
-
+    private Location myLocation;
+    private static final int MY_LOC_ZOOM_FACTOR = 17;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,14 +92,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT);
                 }
             }
-        }catch(Exception e){
-            Log.d("MyMap","caught exception in getlocation");
+        } catch (Exception e) {
+            Log.d("MyMap", "caught exception in getlocation");
             e.printStackTrace();
         }
 
 
-
     }
+
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             // Called when a new location is found by the network location provider.
@@ -115,11 +118,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //case LocationProvider.Outofservice--> request updates from Network_Provider
             //case LocationProvider.TemporarilyUnavailable--> request updates from Network_Provider
             //CASE DEFAULT request updates from network provider.
+
         }
 
-        public void onProviderEnabled(String provider) {}
+        public void onProviderEnabled(String provider) {
+        }
 
-        public void onProviderDisabled(String provider) {}
+        public void onProviderDisabled(String provider) {
+        }
     };
 
     LocationListener locationListerNetwork = new LocationListener() {
@@ -133,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-        //Output log.d message and toast
+            //Output log.d message and toast
         }
 
         @Override
@@ -146,9 +152,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
     };
-    public void dropAMarker(Location location){
-        LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addCircle(new CircleOptions().center(coordinates).radius(.3).fillColor(Color.GREEN));
+
+    public void dropAMarker(String provider) {
+      LatLng userLocation = null;
+
+        if (locationManager != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            myLocation = locationManager.getLastKnownLocation(provider);
+
+        }
+         if(myLocation == null){
+             //Display a message vua log.d or toast
+         }else{
+             //get uiser location
+             userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+             //display a message with lat/long
+             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation,MY_LOC_ZOOM_FACTOR);
+             //drop the actual marker on the map
+             //If using circle, reference Android Circle class
+             Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
+             mMap.animateCamera(update);
+
+         }
     }
 
     /**
