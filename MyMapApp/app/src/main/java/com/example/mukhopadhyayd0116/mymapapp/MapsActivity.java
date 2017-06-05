@@ -37,6 +37,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
     private Location myLocation;
     private static final int MY_LOC_ZOOM_FACTOR = 17;
+    private int color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,9 +125,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast that gps is enabled and working
             //drop a marker on map- create a method called dropAmarker
             //remove the network location updates. Hint see the locationManager for update removal method
+           color= Color.RED;
             dropAMarker(location.getProvider());
 
 
+            try {
+                locationManager.removeUpdates(locationListener);
+
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+            }
+            catch (SecurityException s) {
+
+            }
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -141,7 +153,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 case LocationProvider.AVAILABLE:
                     Log.d("myMap", "LocationProvider AVAILABLE");
                     try {
-
+                        color = Color.RED;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -154,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
                     try{
+                        color = Color.GREEN;
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -165,6 +178,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
                     try{
+                        color  = Color.GREEN;
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -194,6 +208,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //drop a marker ion map- create a method called drop a marker
             //relaunch a network provider request(request locationUpdates(Network_Provider))
             dropAMarker(location.getProvider());
+
+
+
 
         }
 
@@ -234,6 +251,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
          if(myLocation == null){
              //Display a message vua log.d or toast
+             Log.d("MyMap","Mylocation is null");
          }else{
              //get uiser location
              userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
@@ -241,7 +259,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
              CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation,MY_LOC_ZOOM_FACTOR);
              //drop the actual marker on the map
              //If using circle, reference Android Circle class
-             Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
+             Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(color).strokeWidth(2).fillColor(color));
              mMap.animateCamera(update);
 
          }
