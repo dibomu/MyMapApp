@@ -89,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         return;
                     }
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
 
 
                     Log.d("MyMap", "GetLocation:NetworkLoc update request successful.");
@@ -125,17 +125,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast that gps is enabled and working
             //drop a marker on map- create a method called dropAmarker
             //remove the network location updates. Hint see the locationManager for update removal method
-           color= Color.RED;
+       try{
+            color = Color.BLUE;
             dropAMarker(location.getProvider());
 
+            locationManager.removeUpdates(locationListerNetwork);
 
-            try {
-                locationManager.removeUpdates(locationListener);
 
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
-            }
+          //  try {
+             //   locationManager.removeUpdates(locationListener);
+
+              //  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+              //          MIN_TIME_BW_UPDATES,
+            //            MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+          }
             catch (SecurityException s) {
 
             }
@@ -153,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 case LocationProvider.AVAILABLE:
                     Log.d("myMap", "LocationProvider AVAILABLE");
                     try {
-                        color = Color.RED;
+                        color = Color.GREEN;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -166,7 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
                     try{
-                        color = Color.GREEN;
+
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -178,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
                     try{
-                        color  = Color.GREEN;
+                        color  = Color.GRAY;
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
@@ -207,8 +210,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast tha gps is enabled and working
             //drop a marker ion map- create a method called drop a marker
             //relaunch a network provider request(request locationUpdates(Network_Provider))
-            dropAMarker(location.getProvider());
 
+            try {
+                  locationManager.removeUpdates(locationListener);
+
+                  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                          MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+            }
+            catch (SecurityException s) {
+
+            }
 
 
 
