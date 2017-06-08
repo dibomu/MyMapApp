@@ -4,6 +4,7 @@ import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,8 +14,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +27,9 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -38,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location myLocation;
     private static final int MY_LOC_ZOOM_FACTOR = 17;
     private int color;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
 
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            //get GPS status
+            //get GPS
+            mMap.setMyLocationEnabled(true);
             isGPSenabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (isGPSenabled) Log.d("MyMaps", "GetLocation:GPS is enabled");
 
@@ -93,7 +101,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     Log.d("MyMap", "GetLocation:NetworkLoc update request successful.");
                     Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT);
-                }  if (isGPSenabled) {
+                }
+                if (isGPSenabled) {
                     Log.d("MyGMap", "getlocation() GPS enabled, requesting loc updates");
                     try {
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -106,7 +115,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d("MyGMap", "se getlocation gps");
                     }
                 }
-
 
 
             }
@@ -125,25 +133,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast that gps is enabled and working
             //drop a marker on map- create a method called dropAmarker
             //remove the network location updates. Hint see the locationManager for update removal method
-try{
-            color = Color.BLUE;
-           Log.d("MyMap","drop a marker2");
-            dropAMarker(location.getProvider());
-Log.d("MyMap","Drop a marker 2");
-          //  locationManager.removeUpdates(locationListerNetwork);
+            try {
+                color = Color.BLUE;
+                Log.d("MyMap", "drop a marker2");
+                dropAMarker(location.getProvider());
+                Log.d("MyMap", "Drop a marker 2");
+                locationManager.removeUpdates(locationListerNetwork);
+
+                //  locationManager.removeUpdates(locationListerNetwork);
 
 
-          //  try {
-             //   locationManager.removeUpdates(locationListener);
+                //  try {
+                //   locationManager.removeUpdates(locationListener);
 
-               locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                         MIN_TIME_BW_UPDATES,
-                       MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
 
 
-        }
-catch(SecurityException s){
-}
+            } catch (SecurityException s) {
+            }
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -166,33 +175,30 @@ catch(SecurityException s){
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
 
 
-                    }
-                    catch (SecurityException s){
+                    } catch (SecurityException s) {
                         Log.d("MyGMap", "se getlocation net");
                     }
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
-                    try{
+                    try {
                         color = Color.GREEN;
 
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
                         Log.d("MyGMap", "getLocation() network location update successful");
-                    }
-                    catch (SecurityException s){
+                    } catch (SecurityException s) {
                         Log.d("MyGMap", "se getlocation net");
                     }
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    try{
-                        color  = Color.GRAY;
+                    try {
+                        color = Color.GRAY;
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
                         Log.d("MyGMap", "getLocation() network location update successful");
-                    }
-                    catch (SecurityException s){
+                    } catch (SecurityException s) {
                         Log.d("MyGMap", "se getlocation net");
                     }
                     break;
@@ -218,19 +224,17 @@ catch(SecurityException s){
 
             try {
                 color = Color.GREEN;
-                Log.d("MyMap","drop a marker");
+                Log.d("MyMap", "drop a marker");
                 dropAMarker(location.getProvider());
-                Log.d("MyMap","drop a marker");
+                Log.d("MyMap", "drop a marker");
                 locationManager.removeUpdates(locationListener);
 
-                  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                          MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
-            }
-            catch (SecurityException s) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+            } catch (SecurityException s) {
 
             }
-
 
 
         }
@@ -238,11 +242,13 @@ catch(SecurityException s){
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             //Output log.d message and toast
-            Log.d("MyMap","Status changed");
-            switch(status){
-                case LocationProvider.AVAILABLE: Log.d("MyGMap", "Network available");
+            Log.d("MyMap", "Status changed");
+            switch (status) {
+                case LocationProvider.AVAILABLE:
+                    Log.d("MyGMap", "Network available");
                     break;
-                case LocationProvider.OUT_OF_SERVICE: Log.d("MyGMap", "Network out of service");
+                case LocationProvider.OUT_OF_SERVICE:
+                    Log.d("MyGMap", "Network out of service");
                     try {
                         color = Color.RED;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -250,12 +256,12 @@ catch(SecurityException s){
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
                         Log.d("MyGMap", "getLocation() gps location update successful");
-                    }
-                    catch (SecurityException s){
+                    } catch (SecurityException s) {
                         Log.d("MyGMap", "se getlocation gps");
                     }
                     break;
-                case LocationProvider.TEMPORARILY_UNAVAILABLE: Log.d("MyGMap", "Network temporarily out of service");
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                    Log.d("MyGMap", "Network temporarily out of service");
                     try {
                         color = Color.RED;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -263,8 +269,7 @@ catch(SecurityException s){
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
                         Log.d("MyGMap", "getLocation() gps location update successful");
-                    }
-                    catch (SecurityException s){
+                    } catch (SecurityException s) {
                         Log.d("MyGMap", "se getlocation gps");
                     }
                     break;
@@ -285,7 +290,7 @@ catch(SecurityException s){
     };
 
     public void dropAMarker(String provider) {
-      LatLng userLocation = null;
+        LatLng userLocation = null;
 
         if (locationManager != null) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -303,20 +308,20 @@ catch(SecurityException s){
             myLocation = locationManager.getLastKnownLocation(provider);
 
         }
-         if(myLocation == null){
-             //Display a message vua log.d or toast
-             Log.d("MyMap","Mylocation is null");
-         }else{
-             //get uiser location
-             userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-             //display a message with lat/long
-             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation,MY_LOC_ZOOM_FACTOR);
-             //drop the actual marker on the map
-             //If using circle, reference Android Circle class
-             Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(color).strokeWidth(2).fillColor(color));
-             mMap.animateCamera(update);
+        if (myLocation == null) {
+            //Display a message vua log.d or toast
+            Log.d("MyMap", "Mylocation is null");
+        } else {
+            //get uiser location
+            userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            //display a message with lat/long
+            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation, MY_LOC_ZOOM_FACTOR);
+            //drop the actual marker on the map
+            //If using circle, reference Android Circle class
+            Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(color).strokeWidth(2).fillColor(color));
+            mMap.animateCamera(update);
 
-         }
+        }
     }
 
     /**
@@ -337,18 +342,43 @@ catch(SecurityException s){
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in St.Louis"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            Log.d("myMapsApp","Failed Permission check 1");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("myMapsApp", "Failed Permission check 1");
             Log.d("myMapsApp", Integer.toString(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)));
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},2);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
 
         }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=  PackageManager.PERMISSION_GRANTED){
-            Log.d("myMapsApp","Failed Permission check 2");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},2);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("myMapsApp", "Failed Permission check 2");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
 
         }
         mMap.setMyLocationEnabled(true);
+    }
+
+    public void searchLocation(View v) {
+        EditText locationSearch = (EditText) findViewById(R.id.editText);
+        String location = locationSearch.getText().toString();
+       List<android.location.Address> addressList = null;
+
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 25);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            android.location.Address address = addressList.get(0);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            //getfromlocationname method
+        }
+
+    }
+    public void clear(View v){
+        mMap.clear();
     }
 }
