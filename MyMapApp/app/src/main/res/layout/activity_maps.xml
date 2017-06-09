@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="Track"
             android:id="@+id/button"
-            android:onClick="getLocation" />
+            android:onClick="toggle" />
 
         <Button
             android:layout_width="wrap_content"

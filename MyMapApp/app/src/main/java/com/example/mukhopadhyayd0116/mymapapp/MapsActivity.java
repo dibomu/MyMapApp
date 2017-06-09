@@ -44,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location myLocation;
     private static final int MY_LOC_ZOOM_FACTOR = 17;
     private int color;
+    private int toggle;
 
 
     @Override
@@ -65,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void getLocation(View view) {
+    public void getLocation() {
         try {
 
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -125,7 +126,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+    public void toggle(View v){
 
+        if( toggle ==0 ){
+            getLocation();
+            toggle = 1;
+        }
+        else{
+            try {
+                locationManager.removeUpdates(locationListener);
+                locationManager.removeUpdates(locationListerNetwork);
+                locationManager = null;
+                toggle = 0;
+            }
+            catch (SecurityException s){
+
+            }
+        }
+
+    }
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -154,6 +173,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } catch (SecurityException s) {
             }
         }
+
+
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // Called when a new location is found by the network location provider.
@@ -365,7 +386,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location != null || !location.equals("")) {
             Geocoder geocoder = new Geocoder(this);
             try {
-                addressList = geocoder.getFromLocationName(location, 25);
+                addressList = geocoder.getFromLocationName(location, 25,myLocation.getLatitude()-.07246377 ,myLocation.getLongitude()-.09433962,myLocation.getLatitude()+.07246377,myLocation.getLongitude()+.09433962);
 
             } catch (IOException e) {
                 e.printStackTrace();
