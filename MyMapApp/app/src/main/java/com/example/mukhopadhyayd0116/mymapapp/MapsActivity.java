@@ -153,11 +153,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast that gps is enabled and working
             //drop a marker on map- create a method called dropAmarker
             //remove the network location updates. Hint see the locationManager for update removal method
+           // boolean isGPS= location.getAccuracy()<=30;
             try {
-                color = Color.BLUE;
-
+                //color = Color.BLUE;
+                if(location.getProvider().toString()=="gps"){
+             Log.d("MyMap","GPS is true");
+                    color =Color.RED;
+Log.d("MyMap", location.getProvider());
+                }
+                else{
+                    Log.d("MyMap","GPS true");
+                    color = Color.BLUE;
+                }
                 Log.d("MyMap", "drop a marker2");
-                dropAMarker(location.getProvider());
+                dropAMarker(location.getProvider(), color);
                 Log.d("MyMap", "Drop a marker 2");
                 locationManager.removeUpdates(locationListerNetwork);
 
@@ -188,41 +197,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //CASE DEFAULT request updates from network provider.
             switch (status) {
                 case LocationProvider.AVAILABLE:
-                    Log.d("myMap", "LocationProvider AVAILABLE");
+                    Log.d("MyMap", "LocationProvider AVAILABLE");
                     try {
 
-                        color = Color.GREEN;
+                       // color = Color.GREEN;
 
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
 
                     } catch (SecurityException s) {
-                        Log.d("MyGMap", "se getlocation net");
+                        Log.d("MyMap", "se getlocation net");
                     }
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
                     try {
-                        color = Color.BLUE;
+                    //    color = Color.BLUE;
 
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
-                        Log.d("MyGMap", "getLocation() network location update successful");
+                        Log.d("MyMap", "getLocation() network location update successful");
                     } catch (SecurityException s) {
-                        Log.d("MyGMap", "se getlocation net");
+                        Log.d("MyMap", "se getlocation net");
                     }
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
                     try {
-                        color = Color.BLUE;
+                        //color = Color.BLUE;
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
-                        Log.d("MyGMap", "getLocation() network location update successful");
+                        Log.d("MyMap", "getLocation() network location update successful");
                     } catch (SecurityException s) {
-                        Log.d("MyGMap", "se getlocation net");
+                        Log.d("MyMap", "se getlocation net");
                     }
                     break;
 
@@ -244,11 +253,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Output in log.d and toast tha gps is enabled and working
             //drop a marker ion map- create a method called drop a marker
             //relaunch a network provider request(request locationUpdates(Network_Provider))
+            boolean isGPS= location.getAccuracy()<=30;
 
             try {
-                color = Color.GREEN;
+                if( location.getProvider().toString()=="network"){
+                   Log.d("MyMap","GPS is not true");
+
+                    Log.d("MyMap", location.getProvider());
+                    color =Color.RED;
+
+                }
+                else{
+                    Log.d("MyMap",location.getProvider().toString());
+                    Log.d("MyMap","GPS is true");
+                    color = Color.BLUE;
+                }
+                //color = Color.GREEN;
                 Log.d("MyMap", "drop a marker");
-                dropAMarker(location.getProvider());
+                dropAMarker(location.getProvider(),color);
                 Log.d("MyMap", "drop a marker");
                 locationManager.removeUpdates(locationListener);
 
@@ -268,32 +290,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MyMap", "Status changed");
             switch (status) {
                 case LocationProvider.AVAILABLE:
-                    Log.d("MyGMap", "Network available");
+                    Log.d("MyMap", "Network available");
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
-                    Log.d("MyGMap", "Network out of service");
+                    Log.d("MyMap", "Network out of service");
                     try {
-                        color = Color.GREEN;
+                       // color = Color.GREEN;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
-                        Log.d("MyGMap", "getLocation() gps location update successful");
+                        Log.d("MyMap", "getLocation() gps location update successful");
                     } catch (SecurityException s) {
-                        Log.d("MyGMap", "se getlocation gps");
+                        Log.d("MyMap", "se getlocation gps");
                     }
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    Log.d("MyGMap", "Network temporarily out of service");
+                    Log.d("MyMap", "Network temporarily out of service");
                     try {
-                        color = Color.GREEN;
+                       // color = Color.GREEN;
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
-                        Log.d("MyGMap", "getLocation() gps location update successful");
+                        Log.d("MyMap", "getLocation() gps location update successful");
                     } catch (SecurityException s) {
-                        Log.d("MyGMap", "se getlocation gps");
+                        Log.d("MyMap", "se getlocation gps");
                     }
                     break;
             }
@@ -312,7 +334,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-    public void dropAMarker(String provider) {
+    public void dropAMarker(String provider,int color) {
         LatLng userLocation = null;
 
         if (locationManager != null) {
