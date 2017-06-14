@@ -156,19 +156,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
            // boolean isGPS= location.getAccuracy()<=30;
             try {
                 //color = Color.BLUE;
-                if(location.getProvider().toString()=="gps"){
+                if(location.getProvider().toString().equals("gps")){
              Log.d("MyMap","GPS is true");
-                    color =Color.RED;
+                    color =Color.BLUE;
 Log.d("MyMap", location.getProvider());
                 }
                 else{
                     Log.d("MyMap","GPS true");
-                    color = Color.BLUE;
+                    color = Color.RED;
                 }
+                locationManager.removeUpdates(locationListerNetwork);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
+
+
                 Log.d("MyMap", "drop a marker2");
                 dropAMarker(location.getProvider(), color);
                 Log.d("MyMap", "Drop a marker 2");
-                locationManager.removeUpdates(locationListerNetwork);
+
 
                 //  locationManager.removeUpdates(locationListerNetwork);
 
@@ -176,9 +182,7 @@ Log.d("MyMap", location.getProvider());
                 //  try {
                 //   locationManager.removeUpdates(locationListener);
 
-               // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                 //       MIN_TIME_BW_UPDATES,
-                   //    MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
+
 
 
             } catch (SecurityException s) {
@@ -202,7 +206,7 @@ Log.d("MyMap", location.getProvider());
 
                        // color = Color.GREEN;
 
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 
@@ -217,7 +221,7 @@ Log.d("MyMap", location.getProvider());
 
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+                              MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
                         Log.d("MyMap", "getLocation() network location update successful");
                     } catch (SecurityException s) {
                         Log.d("MyMap", "se getlocation net");
@@ -256,12 +260,13 @@ Log.d("MyMap", location.getProvider());
             boolean isGPS= location.getAccuracy()<=30;
 
             try {
-                if( location.getProvider().toString()=="network"){
+                if( location.getProvider().toString().equals("network")){
                    Log.d("MyMap","GPS is not true");
 
                     Log.d("MyMap", location.getProvider());
                     color =Color.RED;
-
+                    //Toast.makeText(getActivity(), "This is my Toast message!",
+                       //     Toast.LENGTH_LONG).show();
                 }
                 else{
                     Log.d("MyMap",location.getProvider().toString());
@@ -269,14 +274,16 @@ Log.d("MyMap", location.getProvider());
                     color = Color.BLUE;
                 }
                 //color = Color.GREEN;
-                Log.d("MyMap", "drop a marker");
-                dropAMarker(location.getProvider(),color);
-                Log.d("MyMap", "drop a marker");
-                locationManager.removeUpdates(locationListener);
-
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                         MIN_TIME_BW_UPDATES,
                         MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListerNetwork);
+               // locationManager.removeUpdates(locationListener);
+                Log.d("MyMap", "drop a marker");
+                dropAMarker(location.getProvider(),color);
+                Log.d("MyMap", "drop a marker");
+
+
+
             } catch (SecurityException s) {
 
             }
@@ -412,15 +419,17 @@ Log.d("MyMap", location.getProvider());
         if (location != null || !location.equals("")) {
             Geocoder geocoder = new Geocoder(this);
             try {
-                addressList = geocoder.getFromLocationName(location, 25,myLocation.getLatitude()-.07246377 ,myLocation.getLongitude()-.09433962,myLocation.getLatitude()+.07246377,myLocation.getLongitude()+.09433962);
+                addressList = geocoder.getFromLocationName(location, 150,myLocation.getLatitude()-.1 ,myLocation.getLongitude()-.09433962,myLocation.getLatitude()+.1,myLocation.getLongitude()+.09433962);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
             android.location.Address address = addressList.get(0);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            for( int i = 0; i < addressList.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
             //getfromlocationname method
         }
 
